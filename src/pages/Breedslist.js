@@ -10,7 +10,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 import { useEffect, useState } from 'react';
-import {getAllDogs}  from '../api/dogs';
+import {getAllDogsApi, getBreedImagesApi}  from '../api/dogs';
 
 import {
     Row,
@@ -20,12 +20,10 @@ import {
     Table,
     Avatar,
     Typography,
-    Select
+    Select,
+    Image
   } from "antd";  
   
-  // Images
-  import face2 from "../assets/images/face-1.jpg";
-
   const { Option } = Select;
   const { Title } = Typography;
   
@@ -55,74 +53,56 @@ import {
 
   ];
     
-  const createItemDog = (breeds, subBreeds, key) => {
-        
+  export function Images(props){
+
+    const {breeds} = props;
+
+    const[urls, setUrls] = useState([]);
+
+    useEffect(() => {
+      getBreedImagesApi(breeds).then(response => {
+        if(response.status === "success"){
+          setUrls(response.message);
+        }  
+      });
+    },[])
+
     return (
-      {
-        key: `breeds ${key}`,
-        name: (
-          <>
-              <div className="avatar-info">
-                <Title level={5}>breeds</Title>
-                <p>{breeds}</p>
-              </div>
-          </>
-        ),
-        function: (
-          <>
-            <div className="author-info">
-              <Title level={5}>subBreeds</Title>
-              { (subBreeds.length > 0) ? 
-                <Select defaultValue="Select" key={`subBreedsSelect${key}`} style={{ width: 120 }} onChange={handleChange}>                
-                {
-                  subBreeds.map(( value) => {
-                    return(
-                      <Option key={`subBreedsOptions${key}-${value}`} value={value}>{value}</Option>
-                    )
-                  } )
-                }
-                </Select>
-                : 
-                <p> There is only one like this! </p>
-              
-              }
-              
-                
-              
-            </div>
-          </>
-        ),  
-        photo: (
-          <>
-            <Avatar.Group>            
-              <Avatar
-                className="shape-avatar"
-                shape="square"
-                size={40}
-                src={face2}
-              ></Avatar>
-            </Avatar.Group>
-          </>
-        )
-      }
+      <>
+      {urls.map(url => { return(  
+        /*
+           <Card
+        hoverable
+        cover={<Image width={50} src={url} />}
+        > 
+        </Card>
+        
+        <Avatar shape="square" size="large" src={url} />
+           */
+        
+        <Avatar
+        className="shape-avatar"
+            shape="square"
+            size={74}
+        style={{
+          backgroundColor: '#8C8C8C',
+        }}
+        src={
+          <Image
+            src={url}
+            style={{
+              width: '100%',
+              height: 'auto',
+              background: '#CCC',
+              objectPosition: 'center center'
+            }}
+          />
+        }
+        />
+      )})}
+        
+      </>
     )
-  }
-
-  const listItemsDog = (listDogs) =>{
-    
-    const itemsList = [];
-
-    let cont = 1;
-    for (const prop in listDogs) {
-      
-      const item =  createItemDog(prop, listDogs[prop],cont );
-      cont++;
-      itemsList.push(item);
-      
-    }
-
-    return itemsList;
-
   }
 
   export default function Breedslist() {
@@ -130,15 +110,80 @@ import {
     
     const[breeds, setBreeds] = useState({});
     
-    //console.log(listItemsDog(breeds));
-
     useEffect(() => {
-      getAllDogs().then(response => {
+      getAllDogsApi().then(response => {
         if(response.status === "success"){
           setBreeds(response.message);
         }  
       });
     },[])
+
+    
+
+    const createItemDog = (breeds, subBreeds, key) => {
+    
+      return (
+        {
+          key: `breeds ${key}`,
+          name: (
+            <>
+                <div className="avatar-info">
+                  <Title level={5}>breeds</Title>
+                  <p>{breeds}</p>
+                </div>
+            </>
+          ),
+          function: (
+            <>
+              <div className="author-info">
+                <Title level={5}>subBreeds</Title>
+                { (subBreeds.length > 0) ? 
+                  <Select defaultValue="Select" key={`subBreedsSelect${key}`} style={{ width: 120 }} onChange={handleChange}>                
+                  {
+                    subBreeds.map(( value) => {
+                      return(
+                        <Option key={`subBreedsOptions${key}-${value}`} value={value}>{value}</Option>
+                      )
+                    } )
+                  }
+                  </Select>
+                  : 
+                  <p> There is only one like this! </p>
+                
+                }
+                
+              </div>
+            </>
+          ),  
+          photo: (
+            <>
+              <Avatar.Group
+              > 
+                <Images breeds={breeds} ></Images>
+              </Avatar.Group>
+            </>
+          )
+        }
+      )
+    }
+  
+    const listItemsDog =  (listDogs) =>{
+      
+      const itemsList = [];
+  
+      let cont = 1;
+      for (const prop in listDogs) {
+          
+        const item =  createItemDog(prop, listDogs[prop],cont);
+        cont++;
+        itemsList.push(item);
+        
+      }
+  
+      return itemsList;
+  
+    }
+  
 
     return (
       <>
@@ -161,13 +206,13 @@ import {
                 <div className="table-responsive">
                   <Table
                     columns={columns}
-                    dataSource={listItemsDog(breeds)}
+                    dataSource={listItemsDog(breeds).slice(0,6)}
                     pagination={false}
                     className="ant-border-space"
                   />
                 </div>
               </Card>
-  
+                
             </Col>
           </Row>
         </div>

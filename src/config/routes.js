@@ -9,6 +9,7 @@ import Home from "../pages/Home";
 import Contact from "../pages/Contact";
 import Error404 from "../pages/Error404";
 import Breedslist from "../pages/Breedslist";
+import FilterBreed from "../pages/FilterBreed";
 
 const routes=[
     {
@@ -25,6 +26,11 @@ const routes=[
         path: "/breedslist",
         layout: LayoutBasic,
         component: Breedslist
+    },
+    {
+        path: "/filterbreed",
+        layout: LayoutBasic,
+        component: FilterBreed
     },
     {
         path: "*",
