@@ -54,6 +54,27 @@ function FilterBreed() {
   const [form] = Form.useForm();
   const [listFilters, setListFilters] = useState([]);
   const [images, setImages] = useState([]);
+  const [filterBreeds, setFilterBreeds] = useState([{text: 'Breeds', value: 'breed'}]);
+  
+  const columns = [
+    {
+      title: 'Breeds',
+      dataIndex: 'breed',
+      key: 'breed' ,
+      filterSearch: true,
+      render: (text) => <a>{text}</a>
+    },
+    {
+      title: 'Sub-Breeds',
+      dataIndex: 'subBreeds',
+    },
+    {
+      title: 'options',
+      dataIndex: 'options',
+      key: 'options',
+      render: fila => <Button type="link" danger onClick={() => deleteFilter(fila)} >{deletebtn}</Button>
+    },
+  ]
 
   useEffect(() => {
     getAllDogsApi().then(response => {
@@ -63,6 +84,10 @@ function FilterBreed() {
     });
   },[])
 
+  function toUpperCaseFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  
   const createOptionBreeds = (listNamesBreed) => {
 
     const options = [];
@@ -70,7 +95,7 @@ function FilterBreed() {
       
     for (const prop in listNamesBreed) {
         
-      options.push(<Option key={`optionBreeds${cont}`} value={prop} >{prop}</Option>)
+      options.push(<Option key={`optionBreeds${cont}`} value={prop} >{toUpperCaseFirstLetter(prop)}</Option>)
       cont++;
     }
   
@@ -103,8 +128,8 @@ function FilterBreed() {
 
     const model = { 
       key: uniquekey,
-      breed: `${values.breed}`,
-      subBreeds: subBreeds,
+      breed: toUpperCaseFirstLetter(values.breed),
+      subBreeds: toUpperCaseFirstLetter(subBreeds),
       options: uniquekey
     } 
 
@@ -134,24 +159,6 @@ function FilterBreed() {
     console.log("Failed:", errorInfo);
   };
 
-  const columns = [
-    {
-      title: 'Breeds',
-      dataIndex: 'breed',
-      key: 'breed' ,
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: 'Sub-Breeds',
-      dataIndex: 'subBreeds',
-    },
-    {
-      title: 'Options',
-      dataIndex: 'options',
-      key: 'options',
-      render: fila => <Button type="link" danger onClick={() => deleteFilter(fila)} >{deletebtn}DELETE</Button>
-    },
-  ];
   
   const deleteFilter = (keyDelete) => {
         
@@ -236,7 +243,7 @@ function FilterBreed() {
                     <Select  style={{ width: '100%' }}>
                       {listSubBreed.map( (valueSubbreed) => {
                         return (
-                          <Option key={valueSubbreed} value={valueSubbreed} >{valueSubbreed}</Option>
+                          <Option key={valueSubbreed} value={valueSubbreed} >{toUpperCaseFirstLetter(valueSubbreed)}</Option>
                         )
                       } )}
                     </Select>
@@ -254,27 +261,23 @@ function FilterBreed() {
                     </Button>
                   </Form.Item>
               </Form>
-              
             </Card>
       </Content>
+      <br></br>
+      <br></br>
       { listFilters.length > 0 ? 
         
-        <Card
-        className="card-profile-head"
-        bodyStyle={{ display: "none" }}
-        title={
-          <Table
-            size='small'
-            rowSelection={{
-              type: 'radio',
-              ...rowSelection,
-            }}
-            columns={columns}
-            dataSource={listFilters}
-          />
-        }
-        >
-        </Card>
+        <>
+         <Table
+          size='small'
+          rowSelection={{
+            type: 'radio',
+            ...rowSelection,
+          }}
+          columns={columns}
+          dataSource={listFilters}
+        />
+        </>
       : null}
       
       <Card

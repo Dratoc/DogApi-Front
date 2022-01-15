@@ -18,7 +18,7 @@ export function getAllDogsApi(){
 
 export function getBreedImagesApi(breeds){
 
-    const url = `${basePath}/breed/${breeds}/images`;
+    const url = `${basePath}/breed/${breeds.toLowerCase()}/images`;
 
     var requestOptions = {
         method: 'GET',
@@ -34,7 +34,7 @@ export function getBreedImagesApi(breeds){
 
 export function getSubBreedImagesApi(breeds, subBreeds){
 
-    const url = `${basePath}/breed/${breeds}/${subBreeds}/images`;
+    const url = `${basePath}/breed/${breeds.toLowerCase()}/${subBreeds.toLowerCase()}/images`;
 
     var requestOptions = {
         method: 'GET',
