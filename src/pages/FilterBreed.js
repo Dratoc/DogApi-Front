@@ -16,39 +16,16 @@ import {
   Col,
   Card,
   Button,
-  List,
-  Descriptions,
-  Avatar,
-  Radio,
-  Switch,
-  Upload,
-  message,
-  Typography,
   Form,
-  Input,
   Layout,
   Select,
-  Divider
+  Divider,
+  Table,
+  notification
 } from "antd";
 
-import {
-  VerticalAlignTopOutlined,
-} from "@ant-design/icons";
-
 import BgProfile from "../assets/images/bg-profile.jpg";
-import profilavatar from "../assets/images/face-1.jpg";
-import convesionImg from "../assets/images/face-3.jpg";
-import convesionImg2 from "../assets/images/face-4.jpg";
-import convesionImg3 from "../assets/images/face-5.jpeg";
-import convesionImg4 from "../assets/images/face-6.jpeg";
-import convesionImg5 from "../assets/images/face-2.jpg";
-import project1 from "../assets/images/home-decor-1.jpeg";
-import project2 from "../assets/images/home-decor-2.jpeg";
-import project3 from "../assets/images/home-decor-3.jpeg";
-import { getAllDogsApi } from "../api/dogs";
-
-
-
+import { getAllDogsApi, getBreedImagesApi, getSubBreedImagesApi } from "../api/dogs";
 
 function FilterBreed() {
   const[breeds, setBreeds] = useState({});
@@ -56,6 +33,8 @@ function FilterBreed() {
   const { Option } = Select;
   const { Content } = Layout;
   const [form] = Form.useForm();
+  const [listFilters, setListFilters] = useState([]);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     getAllDogsApi().then(response => {
@@ -64,7 +43,6 @@ function FilterBreed() {
       }  
     });
   },[])
-
 
   const createOptionBreeds = (listNamesBreed) => {
 
@@ -80,7 +58,6 @@ function FilterBreed() {
     return options;
   }
   
-
   const handleChange = (valueSelected) => {
        
     setListSubBreed([]);
@@ -97,92 +74,110 @@ function FilterBreed() {
 
   };  
 
-
-  const pencil = [
+ 
+  const deletebtn = [
     <svg
-      width="20"
-      height="20"
+      width="16"
+      height="16"
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       key={0}
     >
       <path
-        d="M13.5858 3.58579C14.3668 2.80474 15.6332 2.80474 16.4142 3.58579C17.1953 4.36683 17.1953 5.63316 16.4142 6.41421L15.6213 7.20711L12.7929 4.37868L13.5858 3.58579Z"
-        className="fill-gray-7"
-      ></path>
-      <path
-        d="M11.3787 5.79289L3 14.1716V17H5.82842L14.2071 8.62132L11.3787 5.79289Z"
-        className="fill-gray-7"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9 2C8.62123 2 8.27497 2.214 8.10557 2.55279L7.38197 4H4C3.44772 4 3 4.44772 3 5C3 5.55228 3.44772 6 4 6L4 16C4 17.1046 4.89543 18 6 18H14C15.1046 18 16 17.1046 16 16V6C16.5523 6 17 5.55228 17 5C17 4.44772 16.5523 4 16 4H12.618L11.8944 2.55279C11.725 2.214 11.3788 2 11 2H9ZM7 8C7 7.44772 7.44772 7 8 7C8.55228 7 9 7.44772 9 8V14C9 14.5523 8.55228 15 8 15C7.44772 15 7 14.5523 7 14V8ZM12 7C11.4477 7 11 7.44772 11 8V14C11 14.5523 11.4477 15 12 15C12.5523 15 13 14.5523 13 14V8C13 7.44772 12.5523 7 12 7Z"
+        fill="#111827"
+        className="fill-danger"
       ></path>
     </svg>,
   ];
 
-  const uploadButton = (
-    <div className="ant-upload-text font-semibold text-dark">
-      {<VerticalAlignTopOutlined style={{ width: 20, color: "#000" }} />}
-      <div>Upload New Project</div>
-    </div>
-  );
 
-  const data = [
-    {
-      title: "Sophie B.",
-      avatar: convesionImg,
-      description: "Hi! I need more information…",
-    },
-    {
-      title: "Anne Marie",
-      avatar: convesionImg2,
-      description: "Awesome work, can you…",
-    },
-    {
-      title: "Ivan",
-      avatar: convesionImg3,
-      description: "About files I can…",
-    },
-    {
-      title: "Peterson",
-      avatar: convesionImg4,
-      description: "Have a great afternoon…",
-    },
-    {
-      title: "Nick Daniel",
-      avatar: convesionImg5,
-      description: "Hi! I need more information…",
-    },
-  ];
-
-  const project = [
-    {
-      img: project1,
-      titlesub: "Project #1",
-      title: "Modern",
-      disciption:
-        "As Uber works through a huge amount of internal management turmoil.",
-    },
-    {
-      img: project2,
-      titlesub: "Project #2",
-      title: "Scandinavian",
-      disciption:
-        "Music is something that every person has his or her own specific opinion about.",
-    },
-    {
-      img: project3,
-      titlesub: "Project #3",
-      title: "Minimalist",
-      disciption:
-        "Different people have different taste, and various types of music, Zimbali Resort",
-    },
-  ];
+  const deleteFilter = (key) => {
+    setImages([]);
+    const newFilter = listFilters.filter( (filter) => filter.key !== key);
+    setListFilters(newFilter);
+    
+    notification["error"]({
+      message: "FILTER DELETED",
+      placement: "bottomRight"
+    })
+  }
 
   const onFinish = (values) => {
-    console.log("Success:", values);
+    let subBreeds = 'There is only one like this!';
+    let key = listFilters.length;
+    if(values.subbreed ){
+      subBreeds = values.subbreed
+    }
+    
+    const model = { 
+      key: `keylistfilters${key}`,
+      breed: `${values.breed}`,
+      subBreeds: subBreeds,
+      options: 
+      <>
+        <Button type="link" danger onClick={() => deleteFilter(key)}>
+          {deletebtn}DELETE
+        </Button>
+      </>
+    } 
+    setListFilters([...listFilters ,model]);
+    
+    notification["success"]({
+      message: "FILTER CREATED",
+      placement: "bottomRight"
+    })
+
   };
 
-  const onFinishFailed = (errorInfo) => {
+  const onFinishFailed = (errorInfo) => {    
     console.log("Failed:", errorInfo);
+  };
+
+  const columns = [
+    {
+      title: 'Breeds',
+      dataIndex: 'breed',
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: 'Sub-Breeds',
+      dataIndex: 'subBreeds',
+    },
+    {
+      title: '',
+      dataIndex: 'options',
+    },
+  ];
+  
+  
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+
+      const {subBreeds, breed} = selectedRows[0];
+      
+      if(subBreeds === "There is only one like this!"){
+        getBreedImagesApi(breed).then(response => {
+          if(response.status === "success"){
+            setImages(response.message); //.slice(0,5)
+          }  
+        });
+      }else{
+        getSubBreedImagesApi(breed, subBreeds).then(response => {
+          if(response.status === "success"){
+            setImages(response.message);
+          }  
+        });
+
+      }      
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === 'Disabled User',
+      name: record.name,
+    }),
   };
 
   return (
@@ -250,75 +245,45 @@ function FilterBreed() {
               
             </Card>
       </Content>
-      <Card
+      { listFilters.length > 0 ? 
+        <Card
+        title='se'
         className="card-profile-head"
         bodyStyle={{ display: "none" }}
         title={
           <>
-              <List
-                header={<div></div>}
-                footer={<div></div>}
-                bordered
-                dataSource={['algo', 'algo2']}
-                renderItem={item => (
-                  <List.Item>
-                    <Typography.Text mark>[ITEM]</Typography.Text> {item}
-                  </List.Item>
-                )}
-              />
+              <div>
+                <Divider />
+                <Table
+                  rowSelection={{
+                    type: 'radio',
+                    ...rowSelection,
+                  }}
+                  columns={columns}
+                  dataSource={listFilters}
+                />
+              </div>
           </>
         }
-      ></Card>
+        >
+        </Card>
+      : null}
       
       <Card
         bordered={false}
         className="header-solid mb-24"
-        title={
-          <>
-            <h6 className="font-semibold">Projects</h6>
-            <p>Architects design houses</p>
-          </>
-        }
       >
         <Row gutter={[24, 24]}>
-          {project.map((p, index) => (
+          {images.map((obj, index) => ( 
             <Col span={24} md={12} xl={6} key={index}>
               <Card
                 bordered={false}
                 className="card-project"
-                cover={<img alt="example" src={p.img} />}
+                cover={<img alt="example" src={obj} />}
               >
-                <div className="card-tag">{p.titlesub}</div>
-                <h5>{p.titile}</h5>
-                <p>{p.disciption}</p>
-                <Row gutter={[6, 0]} className="card-footer">
-                  <Col span={12}>
-                    <Button type="button">VIEW PROJECT</Button>
-                  </Col>
-                  <Col span={12} className="text-right">
-                    <Avatar.Group className="avatar-chips">
-                      <Avatar size="small" src={profilavatar} />
-                      <Avatar size="small" src={convesionImg} />
-                      <Avatar size="small" src={convesionImg2} />
-                      <Avatar size="small" src={convesionImg3} />
-                    </Avatar.Group>
-                  </Col>
-                </Row>
               </Card>
             </Col>
           ))}
-          <Col span={24} md={12} xl={6}>
-            <Upload
-              name="avatar"
-              listType="picture-card"
-              className="avatar-uploader projects-uploader"
-              showUploadList={false}
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              onChange={handleChange}
-            >
-               uploadButton
-            </Upload>
-          </Col>
         </Row>
       </Card>
     </>
