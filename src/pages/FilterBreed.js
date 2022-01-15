@@ -51,13 +51,11 @@ import { getAllDogsApi } from "../api/dogs";
 
 
 function FilterBreed() {
-  const [imageURL, setImageURL] = useState(false);
-  const [, setLoading] = useState(false);
   const[breeds, setBreeds] = useState({});
-  const[nameBreedSelected, setNameBreedSelected] = useState('');
   const[listSubBreed, setListSubBreed] = useState([]);
   const { Option } = Select;
   const { Content } = Layout;
+  const [form] = Form.useForm();
 
   useEffect(() => {
     getAllDogsApi().then(response => {
@@ -66,6 +64,7 @@ function FilterBreed() {
       }  
     });
   },[])
+
 
   const createOptionBreeds = (listNamesBreed) => {
 
@@ -81,54 +80,21 @@ function FilterBreed() {
     return options;
   }
   
-  const getSubBreeds = (listNamesBreed, nameSelected) => {
-    
-    for (const prop in listNamesBreed) {
-        
-      if(nameSelected === prop){
-        console.log()
-        return (`listNamesBreed.${prop}`);
-      }
-    }
 
-    return null;
-  }
-
- // getSubBreeds(breeds, 'bulldog' )
-  const createOptionSubBreeds = (nameBreeds) => {
-
-    const options = [];
-    let cont = 1;
-      
-    for (const prop in nameBreeds) {
-        
-      options.push(<Option key={`optionSubBreeds${cont}`} value={prop} >{prop}</Option>)
-      cont++;
-    }
-  
-    return options;
-  }
-
-  const beforeUpload = (file) => {
-    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-    if (!isJpgOrPng) {
-      message.error("You can only upload JPG/PNG file!");
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error("Image must smaller than 2MB!");
-    }
-    return isJpgOrPng && isLt2M;
-  };
-
-  
   const handleChange = (valueSelected) => {
+       
     setListSubBreed([]);
-    setNameBreedSelected(valueSelected);
-    
-    if(breeds[valueSelected].length > 0){
-      setListSubBreed(breeds[valueSelected]);
+
+    if(breeds[valueSelected].length > 0){ 
+      
+      form.setFieldsValue({
+        breeds: valueSelected,
+        subbreed: ''
+      });
+
+      setListSubBreed(breeds[valueSelected]);      
     }
+
   };  
 
 
@@ -219,16 +185,6 @@ function FilterBreed() {
     console.log("Failed:", errorInfo);
   };
 
-  
-
-const dataitem = [
-  'Racing car sprays burning fuel into crowd.',
-  'Japanese princess to wed commoner.',
-  'Australian walks 100km after outback crash.',
-  'Man charged over missing wedding girl.',
-  'Los Angeles battles huge wildfires.',
-];
-
   return (
     <>
       <div
@@ -243,6 +199,8 @@ const dataitem = [
               bordered="false"
             >
               <Form
+                form={form}
+                layout="vertical"
                 name="basic"
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
@@ -251,6 +209,7 @@ const dataitem = [
               >
                 <Form.Item
                   name="breed"
+                  label="Breed"
                   rules={[
                     { required: true, message: "Please select a breed!" },
                   ]}
@@ -261,12 +220,13 @@ const dataitem = [
                 </Form.Item> 
                 { listSubBreed.length > 0 ?
                   <Form.Item
+                    label="Sub-Breed"
                     name="subbreed"
                     rules={[
                       { required: true, message: "Please select a subBreed!" },
                     ]}
                   >
-                    <Select  defaultValue='Please select a Sub-Breed' style={{ width: '100%' }}>
+                    <Select  style={{ width: '100%' }}>
                       {listSubBreed.map( (valueSubbreed) => {
                         return (
                           <Option key={valueSubbreed} value={valueSubbreed} >{valueSubbreed}</Option>
@@ -295,19 +255,17 @@ const dataitem = [
         bodyStyle={{ display: "none" }}
         title={
           <>
-            <Divider orientation="left">List Filter...</Divider>
               <List
                 header={<div></div>}
                 footer={<div></div>}
                 bordered
-                dataSource={dataitem}
+                dataSource={['algo', 'algo2']}
                 renderItem={item => (
                   <List.Item>
                     <Typography.Text mark>[ITEM]</Typography.Text> {item}
                   </List.Item>
                 )}
               />
-            <Divider orientation="left">Small Size</Divider>
           </>
         }
       ></Card>
@@ -356,14 +314,9 @@ const dataitem = [
               className="avatar-uploader projects-uploader"
               showUploadList={false}
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              beforeUpload={beforeUpload}
               onChange={handleChange}
             >
-              {imageURL ? (
-                <img src={imageURL} alt="avatar" style={{ width: "100%" }} />
-              ) : (
-                uploadButton
-              )}
+               uploadButton
             </Upload>
           </Col>
         </Row>

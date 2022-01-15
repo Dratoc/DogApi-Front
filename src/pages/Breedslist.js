@@ -70,15 +70,6 @@ import {
     return (
       <>
       {urls.map(url => { return(  
-        /*
-           <Card
-        hoverable
-        cover={<Image width={50} src={url} />}
-        > 
-        </Card>
-        
-        <Avatar shape="square" size="large" src={url} />
-           */
         
         <Avatar
         className="shape-avatar"
