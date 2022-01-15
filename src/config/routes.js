@@ -18,6 +18,11 @@ const routes=[
         component: Home
     },
     {
+        path: "/dashboard",
+        layout: LayoutBasic,
+        component: Home
+    },
+    {
         path: "/contact",
         layout: LayoutBasic,
         component: Contact

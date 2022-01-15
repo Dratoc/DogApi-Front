@@ -404,7 +404,7 @@ function Header({
               </div>
             </div>
           </Drawer>
-          <Input
+          <Input 
             className="header-search"
             placeholder="Type here..."
             prefix={<SearchOutlined />}

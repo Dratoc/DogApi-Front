@@ -198,6 +198,7 @@ function FilterBreed() {
         style={{ backgroundImage: "url(" + BgProfile + ")" }}
       >
       </div>
+      <br></br>
       <Content className="p-0">
       <Card
               className="card-signup header-solid h-full ant-card pt-0"
@@ -257,8 +258,8 @@ function FilterBreed() {
             </Card>
       </Content>
       { listFilters.length > 0 ? 
+        
         <Card
-        title='se'
         className="card-profile-head"
         bodyStyle={{ display: "none" }}
         title={
